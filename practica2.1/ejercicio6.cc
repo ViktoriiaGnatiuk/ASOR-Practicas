@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <iostream>
+#include <errno.h>
 int main(int argc, char* argv[]) {
 	long max_args = sysconf(_SC_ARG_MAX);
 	if(max_args == -1){
