@@ -7,7 +7,9 @@
 int main() {
 	int respuesta=setuid(0);
 	if(respuesta == -1){
-		perror("setuid");
+		//perror("setuid");
+		std::cout << "setuid ha devuelto " << respuesta << std::endl;
+		std::cout << "ERROR: " << strerror(errno) << std::endl;
 		return -1;	
 	}
 	return 1;

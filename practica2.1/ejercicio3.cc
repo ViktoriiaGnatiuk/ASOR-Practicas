@@ -5,10 +5,8 @@
 #include <errno.h>
 #include <string.h>
 int main() {
-	int respuesta=setuid(0);
-	if(respuesta == -1){
-		perror("setuid");
-		return -1;	
+	for(int i=1; i <  134; i++) {
+		std::cout <<i<< " - " << strerror(i) << std::endl;	
 	}
-	return 1;
+	return -1;
 }
