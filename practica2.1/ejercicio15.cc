@@ -19,6 +19,13 @@ int main() {
 	}
 	int anio = time -> tm_year;/* años desde 1900 */
 	int anio_real = 1900 + anio;
-	std::cout << anio_real << std::endl; 
+
+	char outstr[200];
+	const char format [] = "%A, %d of %B of %Y, %H:%M";
+	if( strftime(outstr, sizeof(outstr), format, time) == 0){
+		perror("strftime");
+		return -1;
+	}
+	std::cout << outstr << std::endl;
 	return 1;
 }
