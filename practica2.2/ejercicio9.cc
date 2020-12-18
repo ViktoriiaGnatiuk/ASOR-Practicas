@@ -35,9 +35,19 @@ int main(int argc, char* argv[]) {
         El tipo de fichero (directorio, enlace simbólico o fichero ordinario).
         La hora en la que se accedió el fichero por última vez.
     */  
-	
+    
 	std::cout << "El número major y minor asociado al dispositivo " << major(statbuf.st_dev) << " - " << minor(statbuf.st_dev) << std::endl;
     std::cout << "El número de i-nodo del fichero " << statbuf.st_ino << std::endl;
-    std::cout << "El tipo de fichero " << statbuf.st_mode << std::endl;
+   if(S_ISLNK(statbuf.st_mode)){
+        std::cout << "Es un enlace simbólico" << std::endl;    
+    }else if(S_ISREG(statbuf.st_mode)){
+        std::cout << "Es un fichero normal" << std::endl;  
+    }else if(S_ISDIR(statbuf.st_mode)){
+        std::cout << "Es un directorio" << std::endl;  
+    }else
+    {
+        std::cout << "Se desconoce el tipo de fichero" << std::endl;
+    }
+    
     std::cout << "La hora en la que se accedió el fichero por última vez " << ctime(&statbuf.st_atim.tv_sec) << std::endl;
 }
