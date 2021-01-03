@@ -18,23 +18,27 @@ int main(int argc, char* argv[]) {
     
     sigset_t set_senales;
     sigemptyset(&set_senales);
-    //Añade una señal al conjunto
-    if( sigaddset(&set_senales, SIGINT) == -1){
-        perror("Se ha producido un error al añadir la señal SIGINT");
-        return -1;
+    if(strcmp (argv[1], "1") == 0){
+        //Añade una señal al conjunto
+        if( sigaddset(&set_senales, SIGINT) == -1){
+            perror("Se ha producido un error al añadir la señal SIGINT");
+            return -1;
+        }
+    }else{
+        //Añade una señal al conjunto
+        if( sigaddset(&set_senales, SIGTSTP) == -1){
+            perror("Se ha producido un error al añadir la señal SIGTSTP");
+            return -1;
+        }
     }
-    //Añade una señal al conjunto
-    if( sigaddset(&set_senales, SIGTSTP) == -1){
-        perror("Se ha producido un error al añadir la señal SIGTSTP");
-        return -1;
-    }
+    
 
     if(sigprocmask(SIG_BLOCK, &set_senales, NULL) == -1){
         perror("Se ha producido un error al bloquear las señales");
         return -1;
     }
 
-    if( setenv("SLEEP_SECS", "20", 0) == -1){
+    if( setenv("SLEEP_SECS", "300", 0) == -1){
         perror("Se ha producido un error al estableces la variable de entorno");
         return -1;
     }
@@ -44,25 +48,15 @@ int main(int argc, char* argv[]) {
         return  -1;
     }
 
-    int secs = atoi(variable);
-    sleep(secs);
-
-    sigset_t pending;
-    sigpending(&pending);
-
-    if (sigismember(&pending, SIGINT) == 1) {
-        printf("Se ha recibido la señal SIGINT\n");
-
-        //Eliminamos la señal del conjunto anterior
-        sigdelset(&set_senales, SIGINT);
-    } 
-    if (sigismember(&pending, SIGTSTP) == 1) {
-        printf("Se ha recibido la señal SIGTSTP\n");
-
-        //Eliminamos la señal del conjunto anterior
-        sigdelset(&set_senales, SIGTSTP);
+    //No puedo hacer sleep porque no se como pasar de char* a unsigned int
+    sleep(20);
+    if(sigismember(&set_senales, SIGINT) == 1){
+        std::cout << "Se ha bloqueado la señal SIGINT";
+    }else if(sigismember(&set_senales, SIGTSTP) == 1){
+        std::cout << "Se ha bloqueado la señal SIGTSTP";
+    }else{
+        std::cout << "No se ha bloqueado ninguna señal";
     }
-
-      sigprocmask(SIG_UNBLOCK, &set_senales, NULL);
+    std::cout << std::endl;
     return 0;
 }
