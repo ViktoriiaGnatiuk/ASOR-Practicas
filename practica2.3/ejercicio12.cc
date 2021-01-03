@@ -6,6 +6,14 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+volatile int contInt = 0;
+volatile int contTstp = 0;
+
+void hler(int senial){
+  if (senial == SIGINT) contInt++;
+  if (senial == SIGTSTP) contTstp++;
+}
 /*
 SIG_BLOCK
     The resulting set will be the union of the current set and the signal set pointed to by set.
@@ -16,47 +24,25 @@ SIG_UNBLOCK
 */
 int main(int argc, char* argv[]) {
     
-    sigset_t set_senales;
-    sigemptyset(&set_senales);
-    if(strcmp (argv[1], "1") == 0){
-        //Añade una señal al conjunto
-        if( sigaddset(&set_senales, SIGINT) == -1){
-            perror("Se ha producido un error al añadir la señal SIGINT");
-            return -1;
-        }
-    }else{
-        //Añade una señal al conjunto
-        if( sigaddset(&set_senales, SIGTSTP) == -1){
-            perror("Se ha producido un error al añadir la señal SIGTSTP");
-            return -1;
-        }
-    }
-    
+     struct sigaction act;
 
-    if(sigprocmask(SIG_BLOCK, &set_senales, NULL) == -1){
-        perror("Se ha producido un error al bloquear las señales");
-        return -1;
-    }
+  //Sigint
+  sigaction(SIGINT, NULL, &act); //Get handler
+  act.sa_handler = hler;
+  sigaction(SIGINT, &act, NULL); //Set sa_handler
+  //Sigtstp
+  sigaction(SIGTSTP, NULL, &act); //Get handler
+  act.sa_handler = hler;
+  sigaction(SIGTSTP, &act, NULL); //Set sa_handler
 
-    if( setenv("SLEEP_SECS", "300", 0) == -1){
-        perror("Se ha producido un error al estableces la variable de entorno");
-        return -1;
-    }
-    char *variable = getenv("SLEEP_SECS");
-    if(variable == NULL) {
-        perror("No se ha encontrado la variable SLEEP_SECS");
-        return  -1;
-    }
 
-    //No puedo hacer sleep porque no se como pasar de char* a unsigned int
-    sleep(20);
-    if(sigismember(&set_senales, SIGINT) == 1){
-        std::cout << "Se ha bloqueado la señal SIGINT";
-    }else if(sigismember(&set_senales, SIGTSTP) == 1){
-        std::cout << "Se ha bloqueado la señal SIGTSTP";
-    }else{
-        std::cout << "No se ha bloqueado ninguna señal";
-    }
+  sigset_t set;
+	sigemptyset(&set);
+
+	while ((contInt + contInt) < 10)
+		sigsuspend(&set);
     std::cout << std::endl;
+    std::cout << "Se han recibido " << contInt << " señales tipo SIGINT" << std::endl;
+    std::cout << "Se han recibido " << contTstp << " señales tipo SIGTSTP" <<std::endl;
     return 0;
 }
