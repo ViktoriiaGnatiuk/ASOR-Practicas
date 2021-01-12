@@ -15,6 +15,8 @@ int main(int argv, char *argc[])
     int fd[2];
     int p = pipe(fd);
     int f = fork();
+    char *const parmList[] = {argc[1], argc[2], argc[3], argc[4], NULL};
+    char *const envParms[2] = {"STEPLIB=SASC.V6.LINKLIB", NULL};
     switch(f)
     {
         case -1:
@@ -25,15 +27,13 @@ int main(int argv, char *argc[])
             //Hijo
             dup2(fd[PIPE_R], 0);
             close(fd[PIPE_W]);
-            close(fd[PIPE_R]);
-            execlp(argc[3],argc[3],argc[4], (char*)NULL);
+            execve("/u/userid/bin/newShell", parmList, envParms);
         break;
         case 1:
             //Padre
             dup2(fd[PIPE_W], 1);
-            close(fd[PIPE_W]);
             close(fd[PIPE_R]);
-            execlp(argc[1],argc[1],argc[2], (char*)NULL);
+            execve("/u/userid/bin/newShell", parmList, envParms);
         break;
     }
     return 0;
